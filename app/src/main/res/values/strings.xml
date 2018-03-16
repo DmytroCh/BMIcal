@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">BMIcal</string>
+    <string name="weight">Weight:</string>
+    <string name="weight_kg">kg</string>
+    <string name="weight_lb">lb</string>
+    <string name="height">Height:</string>
+    <string name="height_cm">cm</string>
+    <string name="height_in">in</string>
+    <string name="result">Write your datas and click COUNT to see the result</string>
+    <string name="count">COUNT</string>
+    <string name="wrong_value">Incorrect input value</string>
+
+    <string name="autor">About autor</string>
+    <string name="save">Save</string>
+    <string name="saved">Saved</string>
+    <string name="liroid">Liroid</string>
+
+    <string name="autor_name">Dmytro Cherednychenko</string>
+</resources>
