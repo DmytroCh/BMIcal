@@ -5,17 +5,29 @@ package com.example.user.bmical;
  */
 
 public final class Config {
+    final static String POINT = ".";
+    final static String ERROR_CODE = "-1";
+    final static String IS_WEIGHT = "weight"; //weight at instanceState
+    final static String IS_HEIGHT = "height";//height at instanceState
+    final static String SP_WEIGHT = "lastWeight";//weight at SharedPreferences
+    final static String SP_HEIGHT = "lastHeight"; //height at SharedPreferences
+    final static String DEFAULT_VALUE = ""; //default value for SP
+
+    //Important BMI values
+        final static  double BOTTOM_BMI_BORDER = 18.5;
+        final static double TOP_BMI_BORDER = 25;
+
     //Metrical system
         //Set min and max values of the height in cm
-        final static double MINHEIGHT_CM=140;
-        final static double MAXHEIGHT_CM=250;
+        final static double MINHEIGHT_CM = 140;
+        final static double MAXHEIGHT_CM = 250;
 
         //Set min and max values of the weight in kg
-        final static double MINWEIGHT_KG=40;
-        final static double MAXWEIGHT_KG=300;
+        final static double MINWEIGHT_KG = 40;
+        final static double MAXWEIGHT_KG = 300;
 
     //Imperial system
-        final static String[] COUNTRIES={"USA", "GBR"};
+        final static String[] COUNTRIES = {"USA", "GBR"};
         //Set min and max values of the height in in
         final static double IN = 0.0254; //1 in=0.0254 m
         final static double MINHEIGHT_IN = (MINHEIGHT_CM / 100) / IN;

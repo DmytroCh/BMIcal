@@ -5,7 +5,7 @@ package com.example.user.bmical;
  */
 
 public class BmiImp extends BMI {
-
+    private static final int CORRECTED_VALUE = 703;
 
     public BmiImp(double weight, double height){
         super(weight, height);
@@ -13,6 +13,6 @@ public class BmiImp extends BMI {
 
     @Override
     public double countBMI() {
-        return (getWeight() / (getHeight() * getHeight())) * 703;
+        return (getWeight() / (getHeight() * getHeight())) * CORRECTED_VALUE;
     }
 }

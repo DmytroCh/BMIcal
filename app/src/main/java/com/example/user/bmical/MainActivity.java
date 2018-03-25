@@ -19,9 +19,16 @@ import android.widget.Toast;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
-    public static final String bmiValue="bmiValue";
+
+    private Button button;
+    private EditText weight;
+    private TextView weight_kg;
+    private EditText height;
+    private TextView height_cm;
+    private LinearLayout layout;
     private BMI objectBMI;
     private boolean isImperial;
+
 
 
     @Override
@@ -29,34 +36,17 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final Button button = findViewById(R.id.button);
-        final EditText weight=findViewById(R.id.weight);
-        final TextView weight_kg=findViewById(R.id.weight_kg);
-        final EditText height=findViewById(R.id.height);
-        final TextView height_cm=findViewById(R.id.height_cm);
-
-
-        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
-        weight.setText( sharedPref.getString("weight", ""), TextView.BufferType.EDITABLE);
-        height.setText(sharedPref.getString("height",""), TextView.BufferType.EDITABLE);
-
+        declareElements();
         isImperial=isImperial();
-
-        if(isImperial){
-            weight_kg.setText(R.string.weight_lb);
-            height_cm.setText(R.string.height_in);
-        }
+        setDatasFromSharedPreferences();
+        setUnits();
 
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                boolean correct = isCorrectValues(weight.getText().toString(),height.getText().toString());
-                if(correct)
-                    objectBMI = createObjectBMI(weight.getText().toString(),height.getText().toString());
-                else
-                    objectBMI = null;
-                openBMIActivity();
+               buttonOnClick(v);
             }
         });
+
         button.setOnTouchListener(new View.OnTouchListener()
         {
             @Override
@@ -67,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        LinearLayout layout = (LinearLayout) findViewById(R.id.layout);
+
         layout.setOnTouchListener(new View.OnTouchListener()
         {
             @Override
@@ -77,6 +67,31 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
+    }
+
+    private void buttonOnClick(View v){
+        boolean correct = isCorrectValues(weight.getText().toString(),height.getText().toString());
+        if(correct)
+            objectBMI = createObjectBMI(weight.getText().toString(),height.getText().toString());
+        else
+            objectBMI = null;
+        openBMIActivity();
+    }
+
+    private void declareElements(){
+        button = (Button) findViewById(R.id.button);
+        weight = (EditText) findViewById(R.id.weight);
+        weight_kg = (TextView) findViewById(R.id.weight_kg);
+        height = (EditText) findViewById(R.id.height);
+        height_cm = (TextView) findViewById(R.id.height_cm);
+        layout = (LinearLayout) findViewById(R.id.layout);
+    }
+
+    private void setUnits(){
+        if(isImperial){
+            weight_kg.setText(R.string.weight_lb);
+            height_cm.setText(R.string.height_in);
+        }
     }
 
     @Override
@@ -93,12 +108,10 @@ public class MainActivity extends AppCompatActivity {
                 openAutorActivity();
                 break;
             case R.id.save:
-                final EditText weight=findViewById(R.id.weight);
-                final EditText height=findViewById(R.id.height);
                 SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putString("weight", weight.getText().toString());
-                editor.putString("height", height.getText().toString());
+                editor.putString(Config.SP_WEIGHT, weight.getText().toString());
+                editor.putString(Config.SP_HEIGHT, height.getText().toString());
                 editor.commit();
                 Toast.makeText(this, R.string.saved, Toast.LENGTH_LONG).show();
                 break;
@@ -106,63 +119,75 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    protected void hideKeyboard(View view)
-    {
+    protected void hideKeyboard(View view){
         InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         in.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+    }
+
+    private void setDatasFromSharedPreferences(){
+        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        weight.setText(sharedPref.getString(Config.SP_WEIGHT, Config.DEFAULT_VALUE), TextView.BufferType.EDITABLE);
+        height.setText(sharedPref.getString(Config.SP_HEIGHT,Config.DEFAULT_VALUE), TextView.BufferType.EDITABLE);
     }
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         // Save the user's current game state
-        //super.onSaveInstanceState(savedInstanceState);
+        super.onSaveInstanceState(savedInstanceState);
+
+        String w;
+        String h;
+
         if(objectBMI != null){
-            savedInstanceState.putString("lastWeight", String.valueOf(objectBMI.getWeight()));
-            savedInstanceState.putString("lastHeight", String.valueOf(objectBMI.getHeight()));
+            w = String.valueOf(objectBMI.getWeight());
+            h = String.valueOf(objectBMI.getHeight());
         }
         else{
-            final EditText weight=findViewById(R.id.weight);
-            final EditText height=findViewById(R.id.height);
-            savedInstanceState.putString("lastWeight", weight.getText().toString());
-            savedInstanceState.putString("lastHeight", height.getText().toString());
+            w = weight.getText().toString();
+            h = height.getText().toString();
         }
-
-
-        // Always call the superclass so it can save the view hierarchy state
-        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putString(Config.IS_WEIGHT, w);
+        savedInstanceState.putString(Config.IS_HEIGHT, h);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        final EditText weight=findViewById(R.id.weight);
-        final EditText height=findViewById(R.id.height);
-        weight.setText(savedInstanceState.getString("lastWeight"), TextView.BufferType.EDITABLE);
-        height.setText(savedInstanceState.getString("lastHeight"), TextView.BufferType.EDITABLE);
+        weight.setText(savedInstanceState.getString(Config.IS_WEIGHT), TextView.BufferType.EDITABLE);
+        height.setText(savedInstanceState.getString(Config.IS_HEIGHT), TextView.BufferType.EDITABLE);
     }
 
     public void openBMIActivity(){
-        String toSend;
-        if(objectBMI!=null && isCorrectValues(String.valueOf(objectBMI.getWeight()), String.valueOf(objectBMI.getHeight())))
-            toSend=String.valueOf(objectBMI.countBMI());
-        else
-            toSend = "-1";
-        Intent intent=new Intent(this, BMIActivity.class);
-        intent.putExtra(bmiValue, toSend);
-        startActivity(intent);
+        String weight;
+        String height;
+        String toSend = Config.ERROR_CODE;
+        boolean isCorrectValues;
+
+        if(objectBMI != null) {
+            weight = String.valueOf(objectBMI.getWeight());
+            height = String.valueOf(objectBMI.getHeight());
+            isCorrectValues = isCorrectValues(weight, height);
+
+            if(isCorrectValues) {
+                toSend = String.valueOf(objectBMI.countBMI());
+            }
+        }
+        BMIActivity.start(this,toSend);
     }
 
     public void openAutorActivity(){
-        Intent intent=new Intent(this, AutorActivity.class);
-        startActivity(intent);
+        AutorActivity.start(this);
     }
 
     private boolean isCorrectValues(String weight, String height){
+        double w;
+        double h;
         boolean result=false;
-        if(!weight.isEmpty() && !weight.equals(".")
-                && !height.isEmpty() && !height.equals(".")){
-            double w=Double.parseDouble(weight);
-            double h=Double.parseDouble(height);
+
+        if(!weight.isEmpty() && !weight.equals(Config.POINT)
+                && !height.isEmpty() && !height.equals(Config.POINT)){
+            w = Double.parseDouble(weight);
+            h = Double.parseDouble(height);
             if(!isImperial){
                 if(h<Config.MAXHEIGHT_CM && h>Config.MINHEIGHT_CM && w<Config.MAXWEIGHT_KG && w>Config.MINWEIGHT_KG){
                     result=true;
@@ -173,7 +198,6 @@ public class MainActivity extends AppCompatActivity {
                     result=true;
                 }
             }
-
         }
         return result;
     }
@@ -193,6 +217,5 @@ public class MainActivity extends AppCompatActivity {
             return new BmiImp(Double.parseDouble(weight), Double.parseDouble(height));
         else
             return new BmiMet(Double.parseDouble(weight), Double.parseDouble(height));
-
     }
 }

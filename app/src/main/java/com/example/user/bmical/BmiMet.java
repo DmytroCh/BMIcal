@@ -5,6 +5,7 @@ package com.example.user.bmical;
  */
 
 public class BmiMet extends BMI{
+    private final static int CORRECTED_VALUE = 100;
 
     public BmiMet(double weight, double height){
         super(weight, height);
@@ -12,6 +13,6 @@ public class BmiMet extends BMI{
 
     @Override
     public double countBMI() {
-        return getWeight() / ((getHeight() / 100) * (getHeight() / 100));
+        return getWeight() / ((getHeight() / CORRECTED_VALUE) * (getHeight() / CORRECTED_VALUE));
     }
 }
